@@ -1,0 +1,6 @@
+[submodule "libs/spdlog"]
+	path = libs/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "libs/jsoncpp"]
+	path = libs/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git
