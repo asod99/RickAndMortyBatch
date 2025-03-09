@@ -10,22 +10,22 @@ cmake_minimum_required(VERSION 3.10)
     # Add executable
     add_executable(RickAndMortyBatch
         src/main.cpp
-        src/ApiClient.cpp
-        src/CharacterProcessor.cpp
-        src/LocationProcessor.cpp
-        src/EpisodeProcessor.cpp
-        src/DatabaseManager.cpp
-        src/BatchProcessor.cpp
-        src/LoggerMenu.cpp
-        src/DataBaseMenu.cpp
-        src/Logger.cpp
-        src/APILoader.cpp
-        src/Config.cpp
-        src/Menu.cpp
+        src/API/ApiClient.cpp
+        src/Processors/CharacterProcessor.cpp
+        src/Processors/LocationProcessor.cpp
+        src/Processors/EpisodeProcessor.cpp
+        src/DataBase/DatabaseManager.cpp
+        src/Batch/BatchProcessor.cpp
+        src/Logger/LoggerMenu.cpp
+        src/DataBase/DataBaseMenu.cpp
+        src/Logger/Logger.cpp
+        src/API/APILoader.cpp
+        src/Config/Config.cpp
+        src/Menu/Menu.cpp
     )
 
     # Include directories
-    target_include_directories(RickAndMortyBatch PRIVATE include)
+    target_include_directories(RickAndMortyBatch PRIVATE include/API include/Batch include/Config include/DataBase include/Helpers include/Logger include/Menu include/Processors)
 
     # Add compiler option for UTF-8
     if(MSVC)

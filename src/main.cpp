@@ -4,13 +4,21 @@
 #include "Logger.h"
 #include "Menu.h"
 #include <iostream>
+#include "Colors.h"
 
 int main() {
     try{
 
         Logger::setupNullLogger();
 
-        std::cout << "WELCOME TO RICK AND MORTY BATCH APP" << std::endl;
+        Color::initialize();
+
+     
+        std::cout << Color::cyan << "=====================================" << Color::reset << std::endl;
+        std::cout << Color::magenta << "********** " << Color::reset << std::endl;
+        Color::printAnimatedText("WELCOME TO RICK AND MORTY BATCH APP", Color::green);
+        std::cout << Color::magenta << "**********" << Color::reset << std::endl;
+        std::cout << Color::cyan << "=====================================" << Color::reset << std::endl;
 
         //Show Welcome Menu
         showConfigurationMenu();
