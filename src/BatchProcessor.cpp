@@ -3,8 +3,7 @@
 #include <stdexcept>
 #include "Logger.h"
 
-BatchProcessor::BatchProcessor(ApiClient& apiClient, DatabaseManager& dbManager) : _apiClient(apiClient), _dbmanager(dbManager)
-{
+BatchProcessor::BatchProcessor(ApiClient& apiClient, DatabaseManager& dbManager) : _apiClient(apiClient), _dbmanager(dbManager) {
     _characterProcessor = std::make_unique<CharacterProcessor>(dbManager);
     _locationProcessor = std::make_unique<LocationProcessor>(dbManager);
     _episodeProcessor = std::make_unique<EpisodeProcessor>(dbManager);
@@ -34,6 +33,7 @@ void BatchProcessor::processResource(const std::string& resource) {
 
     while (hasMorePages) {
         try {
+            spdlog::debug("Fetching page {} for resource: {}", page, resource);
             Json::Value data = _apiClient.getResource(resource, page, filters);
             const Json::Value& results = data["results"];
             if (results.empty()) {
@@ -41,6 +41,7 @@ void BatchProcessor::processResource(const std::string& resource) {
                 break;
             }
 
+            spdlog::info("Processing {} results for resource: {}", results.size(), resource);
             if (resource == "episode") {
                 _episodeProcessor->process(results);
             } else if (resource == "location") {
@@ -51,6 +52,11 @@ void BatchProcessor::processResource(const std::string& resource) {
 
             ++page;
             hasMorePages = !data["info"]["next"].isNull();
+            if (hasMorePages) {
+                spdlog::debug("More pages available for resource: {}. Moving to page {}", resource, page);
+            } else {
+                spdlog::info("No more pages for resource: {}", resource);
+            }
         } catch (const std::exception& e) {
             spdlog::error("Failed to process resource {}: {}", resource, e.what());
             hasMorePages = false;

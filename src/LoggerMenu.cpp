@@ -42,7 +42,7 @@ void showLoggerMenu() {
                     case 5: logLevel = spdlog::level::err; break;
                     case 6: logLevel = spdlog::level::critical; break;
                     case 7: logLevel = spdlog::level::off; break;
-                    default: std::cout << "Invalid option. Please try again.\n"; break;
+                    default: std::cout << "Invalid option. Please try again.\n"; continue;
                 }
                 std::cout << "Log level set.\n";
                 break;
@@ -59,8 +59,7 @@ void showLoggerMenu() {
                     logFilePath = (std::filesystem::current_path() / "default.log").string();
                     std::cout << "No log file path specified. Using default: " << logFilePath << "\n";
                 }
-                enableLogger(loggerEnabled,logFilePath, logLevel);
-
+                enableLogger(loggerEnabled, logFilePath, logLevel);
                 std::cout << "Logger " << (loggerEnabled ? "enabled" : "disabled") << ".\n";
                 break;
             }
@@ -72,11 +71,9 @@ void showLoggerMenu() {
                 break;
         }
     } while (choice != 5);
-
 }
 
-void enableLogger(bool loggerEnabled,const std::string& logFilePath, spdlog::level::level_enum logLevel)
-{
+void enableLogger(bool loggerEnabled, const std::string& logFilePath, spdlog::level::level_enum logLevel) {
     if (loggerEnabled) {
         Logger::init(logFilePath, logLevel);
     } else {

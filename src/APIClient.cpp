@@ -8,9 +8,8 @@
 
 std::unique_ptr<ApiClient> ApiClient::instance = nullptr;
 
-ApiClient::ApiClient()
-{
-    spdlog::info("ApiClient initialized ");
+ApiClient::ApiClient() {
+    spdlog::info("ApiClient initialized.");
 }
 
 Json::Value ApiClient::getResource(std::string_view resource, int page, const std::unordered_map<std::string, std::string>& filters) {
@@ -28,6 +27,7 @@ Json::Value ApiClient::getResource(std::string_view resource, int page, const st
         throw std::runtime_error("Failed to parse JSON: " + errs);
     }
 
+    spdlog::info("Successfully fetched and parsed resource from API.");
     return root;
 }
 
@@ -39,6 +39,7 @@ std::string ApiClient::constructUrl(std::string_view resource, int page, const s
         url << "&" << key << "=" << value;
     }
 
+    spdlog::debug("Constructed URL: {}", url.str());
     return url.str();
 }
 
@@ -54,6 +55,7 @@ std::string ApiClient::httpGet(std::string_view url) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
+    spdlog::info("Performing HTTP GET request to URL: {}", url);
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
         spdlog::error("CURL request error: {}", curl_easy_strerror(res));
@@ -61,6 +63,7 @@ std::string ApiClient::httpGet(std::string_view url) {
         throw std::runtime_error("CURL request error: " + std::string(curl_easy_strerror(res)));
     }
 
+    spdlog::info("HTTP GET request successful.");
     curl_easy_cleanup(curl);
     return response;
 }
@@ -72,16 +75,20 @@ size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, void*
 
 ApiClient& ApiClient::getInstance() {
     if (!instance) {
+        spdlog::info("Creating a new instance of ApiClient.");
         instance = std::unique_ptr<ApiClient>(new ApiClient());
-    } 
+    } else {
+        spdlog::info("Returning existing instance of ApiClient.");
+    }
     return *instance;
 }
 
 std::string ApiClient::getBaseUrl() const {
+    spdlog::debug("Getting base URL: {}", baseUrl);
     return baseUrl;
 }
 
 void ApiClient::updateBaseUrl(const std::string& newBaseUrl) {
-    spdlog::info("Updating URL base API with : {} ", newBaseUrl);
+    spdlog::info("Updating API base URL to: {}", newBaseUrl);
     baseUrl = newBaseUrl;
 }
