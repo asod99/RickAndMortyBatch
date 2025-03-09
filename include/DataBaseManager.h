@@ -10,11 +10,19 @@
  */
 class DatabaseManager {
 public:
+
+    // Evitar copia y asignación
+    DatabaseManager(const DatabaseManager&) = delete;
+    DatabaseManager& operator=(const DatabaseManager&) = delete;
+
+    // Método estático para obtener la instancia única
+    static DatabaseManager& getInstance();
+
     /**
      * @brief Constructs a DatabaseManager and establishes a connection.
      * @param connectionString Connection string for the database.
      */
-    explicit DatabaseManager(const std::string& connectionString);
+    explicit DatabaseManager();
 
     /**
      * @brief Inserts a character into the database.
@@ -62,8 +70,41 @@ public:
     void insertEpisode(int id, const std::string& name, const std::string& airDate,
                        const std::string& episode, const std::string& url, const std::string& created);
 
+
+    void updateconnectionStringAndConnect(const std::string& newconnectionString);
+
+    void createDataBaseIfNotExist();
+
+    void insertCharacterEpisode(int characterId, int episodeId);
+
+    void createTablesIfNotExist();
+
+    void insertCharacterLocation(int characterId, int locationId);
+
+    void setHost(const std::string& h) { host = h; }
+    void setUser(const std::string& u) { user = u; }
+    void setPort(const std::string& p) { port = p; }
+    void setPassword(const std::string& pwd) { password = pwd; }
+
+    std::string getHost() const { return host; }
+    std::string getUser() const { return user; }
+    std::string getPort() const { return port; }
+
+    void connectToDatabase();
+    
+    bool isConnected();
+
 private:
-    pqxx::connection conn; ///< Database connection.
+
+    std::map<std::string, std::string> parseConnectionString(const std::string& connectionString);
+
+    std::string host;
+    std::string user;
+    std::string database;
+    std::string port;
+    std::string password;
+    static std::unique_ptr<DatabaseManager> instance;
+    std::unique_ptr<pqxx::connection> conn; ///< Database connection.
 };
 
 #endif // DATABASEMANAGER_H

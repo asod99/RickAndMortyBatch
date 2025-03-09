@@ -22,6 +22,8 @@ public:
      */
     void process(const Json::Value& data);
 
+    int extractCharacterIdFromUrl(const std::string& characterUrl);
+
 private:
     DatabaseManager& dbManager; ///< Reference to the DatabaseManager.
 };

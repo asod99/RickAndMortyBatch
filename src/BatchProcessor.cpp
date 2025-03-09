@@ -2,7 +2,11 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 
-BatchProcessor::BatchProcessor(ApiClient& apiClient) : apiClient(apiClient) {
+BatchProcessor::BatchProcessor(ApiClient& apiClient, DatabaseManager& dbManager) : _apiClient(apiClient), _dbmanager(dbManager)
+{
+    _characterProcessor = std::make_unique<CharacterProcessor>(dbManager);
+    _locationProcessor = std::make_unique<LocationProcessor>(dbManager);
+    _episodeProcessor = std::make_unique<EpisodeProcessor>(dbManager);
     spdlog::info("BatchProcessor initialized.");
 }
 
@@ -10,19 +14,14 @@ void BatchProcessor::execute() {
     spdlog::info("Starting batch processing for all resources.");
 
     try {
+        processResource("episode");
         processResource("character");
         processResource("location");
-        processResource("episode");
     } catch (const std::exception& e) {
         spdlog::error("Batch processing failed: {}", e.what());
     }
 
     spdlog::info("Batch processing completed.");
-}
-
-void BatchProcessor::setFilters(const std::string& resource, const std::unordered_map<std::string, std::string>& filters) {
-    resourceFilters[resource] = filters;
-    spdlog::info("Filters set for resource {}: {}", resource, filters.size());
 }
 
 void BatchProcessor::processResource(const std::string& resource) {
@@ -34,19 +33,19 @@ void BatchProcessor::processResource(const std::string& resource) {
 
     while (hasMorePages) {
         try {
-            Json::Value data = apiClient.getResource(resource, page, filters);
+            Json::Value data = _apiClient.getResource(resource, page, filters);
             const Json::Value& results = data["results"];
             if (results.empty()) {
                 spdlog::info("No more results for resource: {}", resource);
                 break;
             }
 
-            if (resource == "character") {
-                CharacterProcessor::process(results);
+            if (resource == "episode") {
+                _episodeProcessor->process(results);
             } else if (resource == "location") {
-                LocationProcessor::process(results);
-            } else if (resource == "episode") {
-                EpisodeProcessor::process(results);
+                _locationProcessor->process(results);
+            } else if (resource == "character") {
+                _characterProcessor->process(results);
             }
 
             ++page;

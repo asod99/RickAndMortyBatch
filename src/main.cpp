@@ -1,6 +1,7 @@
 #include "Config.h"
-#include "Logger.h"
+#include <spdlog/spdlog.h>
 #include "ApiClient.h"
+#include "Logger.h"
 #include "DatabaseManager.h"
 #include "CharacterProcessor.h"
 #include "LocationProcessor.h"
@@ -10,32 +11,17 @@
 #include <iostream>
 
 int main() {
-    try {
-        // Load configuration
-        Config::load("config/config.json");
+    try{
 
-        // Initialize logger
-        Logger::init(Config::getLogFilePath());
+        Logger::setupNullLogger();
 
-        // Log application start
-        spdlog::info("Application started.");
+        std::cout << "WELCOME TO RICK AND MORTY BATCH APP" << std::endl;
 
-        // Initialize database manager
-        DatabaseManager dbManager(Config::getDatabaseConnectionString());
-
-        // Initialize API client
-        ApiClient apiClient(Config::getApiBaseUrl());
-
-        // Initialize processors
-        CharacterProcessor charProcessor(dbManager);
-        LocationProcessor locProcessor(dbManager);
-        EpisodeProcessor epiProcessor(dbManager);
-
-        // Initialize batch processor
-        BatchProcessor batchProcessor(apiClient);
+        //Show Welcome Menu
+        showConfigurationMenu();
 
         // Show menu
-        showMenu(batchProcessor, dbManager);
+        showMenu();
 
         // Log application end
         spdlog::info("Application finished.");

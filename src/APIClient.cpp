@@ -4,9 +4,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <utility>
+#include <iostream>
 
-ApiClient::ApiClient(std::string_view baseUrl) : baseUrl(baseUrl) {
-    spdlog::info("ApiClient initialized with base URL: {}", baseUrl);
+std::unique_ptr<ApiClient> ApiClient::instance = nullptr;
+
+ApiClient::ApiClient()
+{
+    spdlog::info("ApiClient initialized ");
 }
 
 Json::Value ApiClient::getResource(std::string_view resource, int page, const std::unordered_map<std::string, std::string>& filters) {
@@ -64,4 +68,20 @@ std::string ApiClient::httpGet(std::string_view url) {
 size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
+}
+
+ApiClient& ApiClient::getInstance() {
+    if (!instance) {
+        instance = std::unique_ptr<ApiClient>(new ApiClient());
+    } 
+    return *instance;
+}
+
+std::string ApiClient::getBaseUrl() const {
+    return baseUrl;
+}
+
+void ApiClient::updateBaseUrl(const std::string& newBaseUrl) {
+    spdlog::info("Updating URL base API with : {} ", newBaseUrl);
+    baseUrl = newBaseUrl;
 }

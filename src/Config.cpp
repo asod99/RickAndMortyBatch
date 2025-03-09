@@ -19,10 +19,6 @@ std::string Config::getDatabaseConnectionString() {
     return configData["database"]["connection_string"].asString();
 }
 
-std::string Config::getLogFilePath() {
-    return configData["logging"]["log_file_path"].asString();
-}
-
 std::string Config::getApiBaseUrl() {
     return configData["api"]["base_url"].asString();
 }

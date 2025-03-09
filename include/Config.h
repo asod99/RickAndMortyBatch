@@ -23,12 +23,6 @@ public:
     static std::string getDatabaseConnectionString();
 
     /**
-     * @brief Retrieves the log file path.
-     * @return Log file path.
-     */
-    static std::string getLogFilePath();
-
-    /**
      * @brief Retrieves the base URL for the API.
      * @return Base URL for the API.
      */

@@ -13,11 +13,19 @@
  */
 class ApiClient {
 public:
+
+    // Evitar copia y asignación
+    ApiClient(const ApiClient&) = delete;
+    ApiClient& operator=(const ApiClient&) = delete;
+
+    // Método estático para obtener la instancia única
+    static ApiClient& getInstance();
+
     /**
      * @brief Constructs an ApiClient.
      * @param baseUrl The base URL of the API.
      */
-    explicit ApiClient(std::string_view baseUrl);
+    explicit ApiClient();
 
     /**
      * @brief Retrieves data from a specific API resource with optional filters.
@@ -29,7 +37,12 @@ public:
      */
     Json::Value getResource(std::string_view resource, int page = 1, const std::unordered_map<std::string, std::string>& filters = {});
 
+    void updateBaseUrl(const std::string& newBaseUrl);
+
+    std::string getBaseUrl() const;
+
 private:
+    static std::unique_ptr<ApiClient> instance;
     std::string baseUrl; ///< Base URL of the API.
 
     /**

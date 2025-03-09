@@ -9,6 +9,10 @@
  * @param batchProcessor Reference to the BatchProcessor.
  * @param dbManager Reference to the DatabaseManager.
  */
-void showMenu(BatchProcessor& batchProcessor, DatabaseManager& dbManager);
+void showMenu();
+
+void showConfigurationMenu();
+
+void updateDatabaseConfig();
 
 #endif // MENU_H

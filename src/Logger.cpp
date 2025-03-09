@@ -1,20 +1,25 @@
 #include "Logger.h"
+#include <iostream>
+#include <memory>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/null_sink.h>
 
 std::shared_ptr<spdlog::logger> Logger::logger = nullptr;
+std::string Logger::currentLogFilePath = "";
 
-void Logger::init(const std::string& logFilePath) {
+void Logger::init(const std::string& logFilePath, spdlog::level::level_enum logLevel) {
     try {
-        // Create a console sink for colored output
-        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        console_sink->set_level(spdlog::level::info);
-
-        // Create a file sink for logging to file
+        // Crear un sink para logging en archivo
         auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath, true);
-        file_sink->set_level(spdlog::level::trace);
+        file_sink->set_level(logLevel);
 
-        // Combine sinks into a multi-sink logger
-        logger = std::make_shared<spdlog::logger>("multi_sink", spdlog::sinks_init_list{console_sink, file_sink});
-        logger->set_level(spdlog::level::trace);
+        currentLogFilePath = logFilePath;
+
+        // Crear el logger con solo el file_sink
+        logger = std::make_shared<spdlog::logger>("file_logger", file_sink);
+        logger->set_level(logLevel);
+        logger->flush_on(logLevel);
 
         // Register the logger
         spdlog::register_logger(logger);
@@ -27,6 +32,16 @@ void Logger::init(const std::string& logFilePath) {
     }
 }
 
+std::string Logger::getLogFilePath() {
+    return currentLogFilePath;
+}
+
 std::shared_ptr<spdlog::logger> Logger::getLogger() {
     return logger;
+}
+
+void Logger::setupNullLogger() {
+    auto null_sink = std::make_shared<spdlog::sinks::null_sink_mt>();
+    auto null_logger = std::make_shared<spdlog::logger>("null_logger", null_sink);
+    spdlog::set_default_logger(null_logger);
 }

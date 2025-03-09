@@ -15,7 +15,7 @@ public:
      * @brief Initializes the logger with a specified log file path.
      * @param logFilePath Path to the log file.
      */
-    static void init(const std::string& logFilePath);
+    static void init(const std::string& logFilePath, spdlog::level::level_enum logLevel);
 
     /**
      * @brief Retrieves the logger instance.
@@ -23,8 +23,15 @@ public:
      */
     static std::shared_ptr<spdlog::logger> getLogger();
 
+    static std::string getLogFilePath();
+
+    static void setupNullLogger();
+
 private:
     static std::shared_ptr<spdlog::logger> logger; ///< Shared pointer to the logger instance.
+
+    static std::string currentLogFilePath;
+
 };
 
 #endif // LOGGER_H

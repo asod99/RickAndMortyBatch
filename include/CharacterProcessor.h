@@ -22,6 +22,8 @@ public:
      */
     void process(const Json::Value& data);
 
+    int extractEpisodeIdFromUrl(const std::string& episodeUrl);
+
 private:
     DatabaseManager& dbManager; ///< Reference to the DatabaseManager.
 };

@@ -25,5 +25,23 @@ void CharacterProcessor::process(const Json::Value& data) {
         std::string created = character["created"].asString();
 
         dbManager.insertCharacter(id, name, status, species, type, gender, originName, originUrl, locationName, locationUrl, image, url, created);
+
+        // Process episodes for this character
+        const Json::Value& episodes = character["episode"];
+        for (const auto& episodeUrl : episodes) {
+            // Get the episode ID from the URL or fetch it from the API if necessary
+            int episodeId = extractEpisodeIdFromUrl(episodeUrl.asString()); // You'll need to implement this
+
+            // Insert the relationship into the character_episodes table
+            dbManager.insertCharacterEpisode(id, episodeId);
+        }
     }
+}
+
+int CharacterProcessor::extractEpisodeIdFromUrl(const std::string& episodeUrl) {
+    size_t lastSlashPos = episodeUrl.find_last_of('/');
+    if (lastSlashPos != std::string::npos) {
+        return std::stoi(episodeUrl.substr(lastSlashPos + 1)); // Extracts the number after the last slash
+    }
+    return -1; // Return -1 if the URL format is not as expected
 }
