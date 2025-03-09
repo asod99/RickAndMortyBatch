@@ -10,8 +10,9 @@
 void DatabaseMenu::showHelp() {
     Color::printAnimatedText("Available commands (order does not matter):", Color::cyan);
     std::cout << Color::yellow << "  characters --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
-    std::cout << Color::yellow << "  episodes --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
-    std::cout << Color::yellow << "  locations --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
+    std::cout << Color::yellow << "  episodes   --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
+    std::cout << Color::yellow << "  locations  --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
+    std::cout << Color::yellow << "  all        --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
     std::cout << Color::green << "Options:" << Color::reset << std::endl;
     std::cout << Color::cyan << "  --filter <field>={value} : Filter by field, use '{value}' for starts with" << Color::reset << std::endl;
     std::cout << Color::cyan << "  --only <field> : Display only specified field" << Color::reset << std::endl;
