@@ -1,6 +1,6 @@
 # Rick and Morty Batch App
 
-![Rick and Morty](https://upload.wikimedia.org/wikipedia/en/a/a6/Rick_and_Morty_season_4.png)
+![Rick and Morty](https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2016/10/rick-morty-critica.jpg)
 
 ## Language / Idioma
 
