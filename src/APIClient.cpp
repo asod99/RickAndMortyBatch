@@ -6,7 +6,7 @@
 #include <utility>
 #include <iostream>
 
-std::unique_ptr<ApiClient> ApiClient::instance = nullptr;
+std::unique_ptr<ApiClient> ApiClient::_instance = nullptr;
 
 ApiClient::ApiClient() {
     spdlog::info("ApiClient initialized.");
@@ -33,7 +33,7 @@ Json::Value ApiClient::getResource(std::string_view resource, int page, const st
 
 std::string ApiClient::constructUrl(std::string_view resource, int page, const std::unordered_map<std::string, std::string>& filters) {
     std::ostringstream url;
-    url << baseUrl << "/" << resource << "?page=" << page;
+    url << _baseUrl << "/" << resource << "?page=" << page;
 
     for (const auto& [key, value] : filters) {
         url << "&" << key << "=" << value;
@@ -74,21 +74,21 @@ size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, void*
 }
 
 ApiClient& ApiClient::getInstance() {
-    if (!instance) {
+    if (!_instance) {
         spdlog::info("Creating a new instance of ApiClient.");
-        instance = std::unique_ptr<ApiClient>(new ApiClient());
+        _instance = std::unique_ptr<ApiClient>(new ApiClient());
     } else {
         spdlog::info("Returning existing instance of ApiClient.");
     }
-    return *instance;
+    return *_instance;
 }
 
 std::string ApiClient::getBaseUrl() const {
-    spdlog::debug("Getting base URL: {}", baseUrl);
-    return baseUrl;
+    spdlog::debug("Getting base URL: {}", _baseUrl);
+    return _baseUrl;
 }
 
 void ApiClient::updateBaseUrl(const std::string& newBaseUrl) {
     spdlog::info("Updating API base URL to: {}", newBaseUrl);
-    baseUrl = newBaseUrl;
+    _baseUrl = newBaseUrl;
 }

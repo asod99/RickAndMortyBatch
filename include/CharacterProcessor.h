@@ -21,7 +21,7 @@ public:
      * @param data The JSON data containing character information.
      */
     void process(const Json::Value& data);
-
+private:
     /**
      * @brief Extracts the episode ID from a given episode URL.
      * @param episodeUrl The URL of the episode.
@@ -29,8 +29,7 @@ public:
      */
     int extractEpisodeIdFromUrl(const std::string& episodeUrl);
 
-private:
-    DatabaseManager& dbManager; ///< Reference to the DatabaseManager for handling database operations.
+    DatabaseManager& _dbManager; ///< Reference to the DatabaseManager for handling database operations.
 };
 
 #endif // CHARACTERPROCESSOR_H

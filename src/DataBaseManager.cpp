@@ -3,9 +3,9 @@
 #include <iostream>
 #include <APILoader.h>
 
-std::unique_ptr<DatabaseManager> DatabaseManager::instance = nullptr;
+std::unique_ptr<DatabaseManager> DatabaseManager::_instance = nullptr;
 
-DatabaseManager::DatabaseManager() : host("localhost"), user("usuario"), database("rickandmorty"), port("5432"), password("default_password") {
+DatabaseManager::DatabaseManager() : _host("localhost"), _user("usuario"), _database("rickandmorty"), _port("5432"), _password("default_password") {
     spdlog::info("DatabaseManager initialized with default connection parameters.");
 }
 
@@ -15,7 +15,7 @@ void DatabaseManager::insertCharacter(int id, const std::string& name, const std
     const std::string& locationName, const std::string& locationUrl,
     const std::string& image, const std::string& url, const std::string& created) {
     try {
-        pqxx::work txn(*conn);
+        pqxx::work txn(*_conn);
 
         // SQL to insert or update character in case of conflict
         std::string query = R"(
@@ -48,7 +48,7 @@ void DatabaseManager::insertCharacter(int id, const std::string& name, const std
 void DatabaseManager::insertLocation(int id, const std::string& name, const std::string& type,
     const std::string& dimension, const std::string& url, const std::string& created) {
     try {
-        pqxx::work txn(*conn);
+        pqxx::work txn(*_conn);
         std::string query = R"(
             INSERT INTO locations (id, name, type, dimension, url, created)
             VALUES ($1, $2, $3, $4, $5, $6)
@@ -71,8 +71,8 @@ void DatabaseManager::insertLocation(int id, const std::string& name, const std:
 void DatabaseManager::insertEpisode(int id, const std::string& name, const std::string& airDate,
     const std::string& episode, const std::string& url, const std::string& created) {
     try {
-        std::lock_guard<std::mutex> lock(dbMutex);
-        pqxx::work txn(*conn);
+        std::lock_guard<std::mutex> lock(_dbMutex);
+        pqxx::work txn(*_conn);
         std::string query = R"(
             INSERT INTO episodes (id, name, air_date, episode, url, created)
             VALUES ($1, $2, $3, $4, $5, $6)
@@ -94,8 +94,8 @@ void DatabaseManager::insertEpisode(int id, const std::string& name, const std::
 
 void DatabaseManager::insertCharacterEpisode(int characterId, int episodeId) {
     try {
-        std::lock_guard<std::mutex> lock(dbMutex);
-        pqxx::work txn(*conn);
+        std::lock_guard<std::mutex> lock(_dbMutex);
+        pqxx::work txn(*_conn);
 
         pqxx::zview query = R"(
             INSERT INTO character_episodes (character_id, episode_id)
@@ -114,8 +114,8 @@ void DatabaseManager::insertCharacterEpisode(int characterId, int episodeId) {
 
 void DatabaseManager::insertCharacterLocation(int characterId, int locationId) {
     try {
-        std::lock_guard<std::mutex> lock(dbMutex);
-        pqxx::work txn(*conn);
+        std::lock_guard<std::mutex> lock(_dbMutex);
+        pqxx::work txn(*_conn);
 
         // SQL to insert the relationship between character and location
         std::string query = R"(
@@ -135,10 +135,10 @@ void DatabaseManager::insertCharacterLocation(int characterId, int locationId) {
 
 DatabaseManager& DatabaseManager::getInstance() {
     try {
-        if (!instance) {
-            instance = std::make_unique<DatabaseManager>();
+        if (!_instance) {
+            _instance = std::make_unique<DatabaseManager>();
         }
-        return *instance;
+        return *_instance;
     } catch (const std::exception& e) {
         spdlog::error("Error creating DatabaseManager instance: {}", e.what());
         throw;
@@ -165,22 +165,22 @@ void DatabaseManager::updateconnectionStringAndConnect(const std::string& newcon
 }
 
 void DatabaseManager::connectToDatabase() {
-    std::string connectionString = "host=" + host +
-    " user=" + user +
-    " port=" + port +
-    " password=" + password;
+    std::string connectionString = "host=" + _host +
+    " user=" + _user +
+    " port=" + _port +
+    " password=" + _password;
 
-    conn = std::make_unique<pqxx::connection>(connectionString);
+    _conn = std::make_unique<pqxx::connection>(connectionString);
 
     createDataBaseIfNotExist();
-    conn->close();
-    conn = std::make_unique<pqxx::connection>(connectionString);
+    _conn->close();
+    _conn = std::make_unique<pqxx::connection>(connectionString);
  
     createTablesIfNotExist();
 
     try {
-        std::lock_guard<std::mutex> lock(dbMutex);
-        pqxx::work txn(*conn);
+        std::lock_guard<std::mutex> lock(_dbMutex);
+        pqxx::work txn(*_conn);
         
         std::string query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
         pqxx::result res = txn.exec(query);
@@ -200,7 +200,7 @@ void DatabaseManager::connectToDatabase() {
     }
 
     try {
-        pqxx::work txn(*conn);
+        pqxx::work txn(*_conn);
         
         // Query to select the first value from the 'characters' table
         std::string query = "SELECT * FROM characters LIMIT 1;";
@@ -239,25 +239,25 @@ std::map<std::string, std::string> DatabaseManager::parseConnectionString(const 
 }
 
 bool DatabaseManager::isConnected() {
-    return conn && conn->is_open();
+    return _conn && _conn->is_open();
 }
 
 void DatabaseManager::createDataBaseIfNotExist() {
     try {
-        std::lock_guard<std::mutex> lock(dbMutex);
-        std::string createDatabaseQuery = "CREATE DATABASE " + database + ";";
-        pqxx::nontransaction txn(*conn);
+        std::lock_guard<std::mutex> lock(_dbMutex);
+        std::string createDatabaseQuery = "CREATE DATABASE " + _database + ";";
+        pqxx::nontransaction txn(*_conn);
         txn.exec(createDatabaseQuery);
         txn.commit();
 
-        spdlog::info("Database '{}' created successfully.", database);
+        spdlog::info("Database '{}' created successfully.", _database);
 
     } catch (const pqxx::sql_error& e) {
         if (std::string(e.what()).find("exist") == std::string::npos) {
             spdlog::error("Failed to create database: {}", e.what());
             throw;
         } else {
-            spdlog::info("Database '{}' already exists.", database);
+            spdlog::info("Database '{}' already exists.", _database);
         }
     } catch (const std::exception& e) {
         spdlog::error("Error while connecting to server or creating database: {}", e.what());
@@ -267,8 +267,8 @@ void DatabaseManager::createDataBaseIfNotExist() {
 
 void DatabaseManager::createTablesIfNotExist() {
     try {
-        std::lock_guard<std::mutex> lock(dbMutex);
-        pqxx::work txn(*conn);
+        std::lock_guard<std::mutex> lock(_dbMutex);
+        pqxx::work txn(*_conn);
 
         // SQL to create the characters table
         std::string createCharactersTableQuery = R"(

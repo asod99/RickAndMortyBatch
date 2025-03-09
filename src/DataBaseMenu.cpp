@@ -31,7 +31,7 @@ string join(const vector<string>& elements, const string& delimiter) {
 
 void DatabaseMenu::executeQuery(const string& query, vector<string> onlyFields, bool showSize, bool sizeOnly) {
     DatabaseManager& dbManager = DatabaseManager::getInstance();
-    std::lock_guard<std::mutex> lock(dbManager.dbMutex);
+    std::lock_guard<std::mutex> lock(dbManager._dbMutex);
 
     if (!dbManager.isConnected()) {
         spdlog::error("Database is not connected.");

@@ -23,7 +23,7 @@ public:
     void process(const Json::Value& data);
 
 private:
-    DatabaseManager& dbManager; ///< Reference to the DatabaseManager.
+    DatabaseManager& _dbManager; ///< Reference to the DatabaseManager.
 };
 
 #endif // EPISODEPROCESSOR_H

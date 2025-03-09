@@ -90,21 +90,11 @@ public:
     void updateconnectionStringAndConnect(const std::string& newconnectionString);
 
     /**
-     * @brief Creates the database if it does not exist.
-     */
-    void createDataBaseIfNotExist();
-
-    /**
      * @brief Inserts a character-episode relationship into the database.
      * @param characterId Character ID.
      * @param episodeId Episode ID.
      */
     void insertCharacterEpisode(int characterId, int episodeId);
-
-    /**
-     * @brief Creates necessary tables if they do not exist.
-     */
-    void createTablesIfNotExist();
 
     /**
      * @brief Inserts a character-location relationship into the database.
@@ -117,43 +107,43 @@ public:
      * @brief Sets the host for the database connection.
      * @param h Hostname.
      */
-    void setHost(const std::string& h) { host = h; }
+    void setHost(const std::string& h) { _host = h; }
 
     /**
      * @brief Sets the user for the database connection.
      * @param u Username.
      */
-    void setUser(const std::string& u) { user = u; }
+    void setUser(const std::string& u) { _user = u; }
 
     /**
      * @brief Sets the port for the database connection.
      * @param p Port number.
      */
-    void setPort(const std::string& p) { port = p; }
+    void setPort(const std::string& p) { _port = p; }
 
     /**
      * @brief Sets the password for the database connection.
      * @param pwd Password.
      */
-    void setPassword(const std::string& pwd) { password = pwd; }
+    void setPassword(const std::string& pwd) { _password = pwd; }
 
     /**
      * @brief Gets the host for the database connection.
      * @return Hostname.
      */
-    std::string getHost() const { return host; }
+    std::string getHost() const { return _host; }
 
     /**
      * @brief Gets the user for the database connection.
      * @return Username.
      */
-    std::string getUser() const { return user; }
+    std::string getUser() const { return _user; }
 
     /**
      * @brief Gets the port for the database connection.
      * @return Port number.
      */
-    std::string getPort() const { return port; }
+    std::string getPort() const { return _port; }
 
     /**
      * @brief Connects to the database using the current connection settings.
@@ -171,10 +161,21 @@ public:
      * @return Reference to the pqxx::connection object.
      */
     pqxx::connection& getConn() {
-        return *conn;
+        return *_conn;
     }
 
 private:
+
+    /**
+     * @brief Creates necessary tables if they do not exist.
+     */
+    void createTablesIfNotExist();
+
+    /**
+     * @brief Creates the database if it does not exist.
+     */
+    void createDataBaseIfNotExist();
+
     /**
      * @brief Parses a connection string into its components.
      * @param connectionString The connection string to parse.
@@ -182,14 +183,14 @@ private:
      */
     std::map<std::string, std::string> parseConnectionString(const std::string& connectionString);
 
-    std::string host; ///< Hostname for the database connection.
-    std::string user; ///< Username for the database connection.
-    std::string database; ///< Database name.
-    std::string port; ///< Port number for the database connection.
-    std::string password; ///< Password for the database connection.
-    static std::unique_ptr<DatabaseManager> instance; ///< Singleton instance of DatabaseManager.
-    std::mutex dbMutex; ///< Mutex for thread-safe database operations.
-    std::unique_ptr<pqxx::connection> conn; ///< Database connection.
+    std::string _host; ///< Hostname for the database connection.
+    std::string _user; ///< Username for the database connection.
+    std::string _database; ///< Database name.
+    std::string _port; ///< Port number for the database connection.
+    std::string _password; ///< Password for the database connection.
+    static std::unique_ptr<DatabaseManager> _instance; ///< Singleton instance of DatabaseManager.
+    std::mutex _dbMutex; ///< Mutex for thread-safe database operations.
+    std::unique_ptr<pqxx::connection> _conn; ///< Database connection.
 
     friend class DatabaseMenu; ///< Allows DatabaseMenu to access private members.
 };

@@ -21,7 +21,7 @@ public:
      * @param data The JSON data containing location information.
      */
     void process(const Json::Value& data);
-
+private:
     /**
      * @brief Extracts the character ID from a given character URL.
      * @param episodeUrl The URL of the character.
@@ -29,8 +29,7 @@ public:
      */
     int extractCharacterIdFromUrl(const std::string& characterUrl);
 
-private:
-    DatabaseManager& dbManager; ///< Reference to the DatabaseManager.
+    DatabaseManager& _dbManager; ///< Reference to the DatabaseManager.
 };
 
 #endif // LOCATIONPROCESSOR_H

@@ -12,17 +12,17 @@ ApiLoader& ApiLoader::getInstance(int intervalSeconds) {
     return instance;
 }
 
-ApiLoader::ApiLoader(int intervalSeconds) : interval(intervalSeconds), stop(false), running(false) {
+ApiLoader::ApiLoader(int intervalSeconds) : _interval(intervalSeconds), _stop(false), _running(false) {
     spdlog::info("ApiLoader initialized with interval: {} seconds", intervalSeconds);
 }
 
 void ApiLoader::start() {
-    std::lock_guard<std::mutex> lock(mutex);
-    if (!running) {
-        stop = false;
-        running = true;
+    std::lock_guard<std::mutex> lock(_mutex);
+    if (!_running) {
+        _stop = false;
+        _running = true;
         spdlog::info("Starting ApiLoader thread.");
-        workerThread = std::thread(&ApiLoader::run, this);
+        _workerThread = std::thread(&ApiLoader::run, this);
     } else {
         spdlog::warn("ApiLoader thread is already running.");
     }
@@ -30,18 +30,18 @@ void ApiLoader::start() {
 
 void ApiLoader::stopLoading() {
     {
-        std::lock_guard<std::mutex> lock(mutex);
-        stop = true;
+        std::lock_guard<std::mutex> lock(_mutex);
+        _stop = true;
     }
-    if (workerThread.joinable()) {
-        workerThread.join();
+    if (_workerThread.joinable()) {
+        _workerThread.join();
         spdlog::info("ApiLoader thread stopped.");
     }
-    running = false;
+    _running = false;
 }
 
 void ApiLoader::loadDataManually() {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     spdlog::info("Manual data load triggered.");
     if (!loadDataFromApi()) {
         spdlog::error("Failed to manually load data due to connection issues.");
@@ -51,14 +51,14 @@ void ApiLoader::loadDataManually() {
 }
 
 void ApiLoader::updateInterval(const int& newIntervalSeconds) {
-    std::lock_guard<std::mutex> lock(mutex);
-    spdlog::info("Updating interval from {} to {} seconds", interval, newIntervalSeconds);
-    interval = newIntervalSeconds;
+    std::lock_guard<std::mutex> lock(_mutex);
+    spdlog::info("Updating interval from {} to {} seconds", _interval, newIntervalSeconds);
+    _interval = newIntervalSeconds;
 }
 
 int ApiLoader::getInterval() const {
-    spdlog::debug("Retrieving current interval: {} seconds", interval);
-    return interval;
+    spdlog::debug("Retrieving current interval: {} seconds", _interval);
+    return _interval;
 }
 
 ApiLoader::~ApiLoader() {
@@ -70,8 +70,8 @@ void ApiLoader::run() {
     spdlog::info("ApiLoader thread running.");
     while (true) {
         {
-            std::lock_guard<std::mutex> lock(mutex);
-            if (stop) {
+            std::lock_guard<std::mutex> lock(_mutex);
+            if (_stop) {
                 spdlog::info("Stop signal received, breaking the loop.");
                 break;
             }
@@ -82,10 +82,10 @@ void ApiLoader::run() {
             break;
         }
 
-        spdlog::info("Sleeping for {} seconds before next data load.", interval);
-        std::this_thread::sleep_for(std::chrono::seconds(interval));
+        spdlog::info("Sleeping for {} seconds before next data load.", _interval);
+        std::this_thread::sleep_for(std::chrono::seconds(_interval));
     }
-    running = false;
+    _running = false;
     spdlog::info("ApiLoader thread finished.");
 }
 

@@ -6,22 +6,22 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/null_sink.h>
 
-std::shared_ptr<spdlog::logger> Logger::logger = nullptr;
-std::string Logger::currentLogFilePath = "";
+std::shared_ptr<spdlog::logger> Logger::_logger = nullptr;
+std::string Logger::_currentLogFilePath = "";
 
 void Logger::init(const std::string& logFilePath, spdlog::level::level_enum logLevel) {
     try {
         auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath, true);
         file_sink->set_level(logLevel);
 
-        currentLogFilePath = logFilePath;
+        _currentLogFilePath = logFilePath;
 
-        logger = std::make_shared<spdlog::logger>("file_logger", file_sink);
-        logger->set_level(logLevel);
-        logger->flush_on(logLevel);
+        _logger = std::make_shared<spdlog::logger>("file_logger", file_sink);
+        _logger->set_level(logLevel);
+        _logger->flush_on(logLevel);
 
-        spdlog::register_logger(logger);
-        spdlog::set_default_logger(logger);
+        spdlog::register_logger(_logger);
+        spdlog::set_default_logger(_logger);
         spdlog::set_pattern("[%Y-%m-%d %H:%M:%S] [%^%l%$] %v");
 
         spdlog::info("Logger initialized with file path: {}", logFilePath);
@@ -31,7 +31,7 @@ void Logger::init(const std::string& logFilePath, spdlog::level::level_enum logL
 }
 
 void Logger::checkLogSizeAndReset() {
-    std::ifstream file(currentLogFilePath);
+    std::ifstream file(_currentLogFilePath);
     if (!file.is_open()) {
         return;
     }
@@ -45,7 +45,7 @@ void Logger::checkLogSizeAndReset() {
     file.close();
 
     if (line_count > 5000) {
-        std::ofstream outFile(currentLogFilePath, std::ofstream::trunc);
+        std::ofstream outFile(_currentLogFilePath, std::ofstream::trunc);
         if (outFile.is_open()) {
             outFile.close();
             spdlog::info("Log file reset after exceeding 5000 lines.");
@@ -54,11 +54,7 @@ void Logger::checkLogSizeAndReset() {
 }
 
 std::string Logger::getLogFilePath() {
-    return currentLogFilePath;
-}
-
-std::shared_ptr<spdlog::logger> Logger::getLogger() {
-    return logger;
+    return _currentLogFilePath;
 }
 
 void Logger::setupNullLogger() {

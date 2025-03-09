@@ -6,8 +6,6 @@
 
 /**
  * @brief Displays the interactive main menu and handles user input.
- * @param batchProcessor Reference to the BatchProcessor for handling batch operations.
- * @param dbManager Reference to the DatabaseManager for managing database connections and operations.
  */
 void showMenu();
 

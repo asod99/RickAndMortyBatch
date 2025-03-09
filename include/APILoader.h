@@ -25,11 +25,6 @@ public:
     void start();
 
     /**
-     * @brief Stops the data loading process.
-     */
-    void stopLoading();
-
-    /**
      * @brief Manually triggers data loading from the API.
      */
     void loadDataManually();
@@ -68,16 +63,22 @@ private:
     void run();
 
     /**
+     * @brief Stops the data loading process.
+     */
+    void stopLoading();
+
+
+    /**
      * @brief Loads data from the API.
      * @return True if data was successfully loaded, false otherwise.
      */
     bool loadDataFromApi();
 
-    int interval; ///< Interval in seconds for data updates.
-    bool stop; ///< Flag to stop the data loading process.
-    bool running; ///< Indicates if the thread is currently running.
-    std::thread workerThread; ///< Thread for running the data loading process.
-    std::mutex mutex; ///< Mutex for synchronizing access to shared resources.
+    int _interval; ///< Interval in seconds for data updates.
+    bool _stop; ///< Flag to stop the data loading process.
+    bool _running; ///< Indicates if the thread is currently running.
+    std::thread _workerThread; ///< Thread for running the data loading process.
+    std::mutex _mutex; ///< Mutex for synchronizing access to shared resources.
 };
 
 #endif // APILOADER_H

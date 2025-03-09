@@ -22,12 +22,6 @@ public:
     static void init(const std::string& logFilePath, spdlog::level::level_enum logLevel);
 
     /**
-     * @brief Retrieves the logger instance.
-     * @return Shared pointer to the logger.
-     */
-    static std::shared_ptr<spdlog::logger> getLogger();
-
-    /**
      * @brief Retrieves the current log file path.
      * @return The current log file path as a string.
      */
@@ -44,8 +38,8 @@ public:
     static void checkLogSizeAndReset();
 
 private:
-    static std::shared_ptr<spdlog::logger> logger; ///< Shared pointer to the logger instance.
-    static std::string currentLogFilePath; ///< Path to the current log file.
+    static std::shared_ptr<spdlog::logger> _logger; ///< Shared pointer to the logger instance.
+    static std::string _currentLogFilePath; ///< Path to the current log file.
 };
 
 #endif // LOGGER_H

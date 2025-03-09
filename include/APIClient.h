@@ -57,8 +57,8 @@ public:
     std::string getBaseUrl() const;
 
 private:
-    static std::unique_ptr<ApiClient> instance; ///< Singleton instance of ApiClient.
-    std::string baseUrl; ///< Base URL of the API.
+    static std::unique_ptr<ApiClient> _instance; ///< Singleton instance of ApiClient.
+    std::string _baseUrl; ///< Base URL of the API.
 
     /**
      * @brief Constructs a URL with query parameters.

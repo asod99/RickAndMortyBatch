@@ -2,7 +2,7 @@
 #include <spdlog/spdlog.h>
 
 LocationProcessor::LocationProcessor(DatabaseManager& dbManager)
-    : dbManager(dbManager) {
+    : _dbManager(dbManager) {
     spdlog::info("LocationProcessor initialized.");
 }
 
@@ -17,7 +17,7 @@ void LocationProcessor::process(const Json::Value& data) {
         std::string url = location["url"].asString();
         std::string created = location["created"].asString();
 
-        dbManager.insertLocation(id, name, type, dimension,url, created);
+        _dbManager.insertLocation(id, name, type, dimension,url, created);
 
         // Process characters for this location
         const Json::Value& characters = location["residents"];
@@ -25,7 +25,7 @@ void LocationProcessor::process(const Json::Value& data) {
             std::string characterUrlString = characterUrl.asString();
             int characterId = extractCharacterIdFromUrl(characterUrlString);
             if (characterId != -1) {
-                dbManager.insertCharacterLocation(characterId, id);
+                _dbManager.insertCharacterLocation(characterId, id);
             }
         }
     }

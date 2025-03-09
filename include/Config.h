@@ -35,7 +35,7 @@ public:
     static uint64_t getApiReconnectTime();
 
 private:
-    static Json::Value configData; ///< JSON object to store configuration data.
+    static Json::Value _configData; ///< JSON object to store configuration data.
 };
 
 #endif // CONFIG_H

@@ -31,7 +31,7 @@ private:
     ApiClient& _apiClient; ///< Reference to the ApiClient.
     DatabaseManager& _dbmanager; ///< Reference to the DatabaseManager.
     
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> resourceFilters; ///< Filters for each resource.
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> _resourceFilters; ///< Filters for each resource.
 
     /**
      * @brief Processes a specific resource type.

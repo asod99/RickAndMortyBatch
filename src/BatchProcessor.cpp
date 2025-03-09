@@ -29,7 +29,7 @@ void BatchProcessor::processResource(const std::string& resource) {
     int page = 1;
     bool hasMorePages = true;
 
-    const auto& filters = resourceFilters.find(resource) != resourceFilters.end() ? resourceFilters[resource] : std::unordered_map<std::string, std::string>{};
+    const auto& filters = _resourceFilters.find(resource) != _resourceFilters.end() ? _resourceFilters[resource] : std::unordered_map<std::string, std::string>{};
 
     while (hasMorePages) {
         try {

@@ -18,6 +18,12 @@
 class DatabaseMenu {
 public:
     /**
+     * @brief Displays and manages the database menu interface.
+     */
+    void dataBaseMenu();
+
+private:
+    /**
      * @brief Displays help information for the database menu.
      */
     void showHelp();
@@ -36,11 +42,6 @@ public:
      * @param command The command string to process.
      */
     void processCommand(const std::string& command);
-
-    /**
-     * @brief Displays and manages the database menu interface.
-     */
-    void dataBaseMenu();
 
     /**
      * @brief Validates if a field exists in a specified table.
