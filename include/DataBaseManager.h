@@ -94,6 +94,10 @@ public:
     
     bool isConnected();
 
+    std::unique_ptr<pqxx::connection> getConn() {
+        return std::move(conn);
+    }
+
 private:
 
     std::map<std::string, std::string> parseConnectionString(const std::string& connectionString);

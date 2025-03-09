@@ -389,4 +389,3 @@ void DatabaseManager::createTablesIfNotExist() {
         spdlog::error("Error creating tables: {}", e.what());
     }
 }
-

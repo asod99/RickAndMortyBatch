@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 3.10)
         src/DatabaseManager.cpp
         src/BatchProcessor.cpp
         src/LoggerMenu.cpp
+        src/DataBaseMenu.cpp
         src/Logger.cpp
         src/Config.cpp
         src/Menu.cpp
