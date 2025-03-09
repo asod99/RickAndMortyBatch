@@ -1,5 +1,7 @@
 #include "LoggerMenu.h"
 #include <spdlog/spdlog.h>
+#include <iostream>
+#include "Colors.h"
 
 void showLoggerMenu() {
     int choice;
@@ -8,31 +10,45 @@ void showLoggerMenu() {
     bool loggerEnabled = false;
 
     do {
-        std::cout << "\n--- Logger Configuration Menu ---\n";
-        std::cout << "1. Show File Path Log\n";
-        std::cout << "2. Set log level\n";
-        std::cout << "3. Set log file path\n";
-        std::cout << "4. Enable/Disable logger\n";
-        std::cout << "5. Return to configuration menu\n";
-        std::cout << "Choose an option: ";
+        Color::printAnimatedText("\n--- Logger Configuration Menu ---", Color::cyan);
+        std::cout << Color::yellow << "1. " << Color::reset << Color::green << "Show File Path Log" << Color::reset << std::endl;
+        std::cout << Color::yellow << "2. " << Color::reset << Color::green << "Set log level" << Color::reset << std::endl;
+        std::cout << Color::yellow << "3. " << Color::reset << Color::green << "Set log file path" << Color::reset << std::endl;
+        std::cout << Color::yellow << "4. " << Color::reset << Color::green << "Enable/Disable logger" << Color::reset << std::endl;
+        std::cout << Color::yellow << "5. " << Color::reset << Color::green << "Return to configuration menu" << Color::reset << std::endl;
+        std::cout << Color::magenta << "Choose an option: " << Color::reset;
         std::cin >> choice;
+
+        if (std::cin.fail()) {
+            std::cout << Color::red << "Invalid input. Please enter a number." << Color::reset << std::endl;
+            std::cin.clear();  // Limpiamos el estado de error
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Limpiamos el buffer de entrada
+            continue;
+        }
 
         switch (choice) {
             case 1:
-                std::cout << "Log file location: " << logFilePath << "\n";
+                std::cout << Color::cyan << "Log file location: " << logFilePath << Color::reset << std::endl;
                 break;
             case 2: {
                 int levelChoice;
-                std::cout << "Select log level:\n";
-                std::cout << "1. Trace\n";
-                std::cout << "2. Debug\n";
-                std::cout << "3. Info\n";
-                std::cout << "4. Warn\n";
-                std::cout << "5. Error\n";
-                std::cout << "6. Critical\n";
-                std::cout << "7. Off\n";
-                std::cout << "Choose an option: ";
+                Color::printAnimatedText("Select log level:", Color::cyan);
+                std::cout << Color::yellow << "1. " << Color::reset << "Trace" << std::endl;
+                std::cout << Color::yellow << "2. " << Color::reset << "Debug" << std::endl;
+                std::cout << Color::yellow << "3. " << Color::reset << "Info" << std::endl;
+                std::cout << Color::yellow << "4. " << Color::reset << "Warn" << std::endl;
+                std::cout << Color::yellow << "5. " << Color::reset << "Error" << std::endl;
+                std::cout << Color::yellow << "6. " << Color::reset << "Critical" << std::endl;
+                std::cout << Color::yellow << "7. " << Color::reset << "Off" << std::endl;
+                std::cout << Color::magenta << "Choose an option: " << Color::reset;
                 std::cin >> levelChoice;
+
+                if (std::cin.fail()) {
+                    std::cout << Color::red << "Invalid input. Please enter a number." << Color::reset << std::endl;
+                    std::cin.clear();  // Limpiamos el estado de error
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Limpiamos el buffer de entrada
+                    continue;
+                }
 
                 switch (levelChoice) {
                     case 1: logLevel = spdlog::level::trace; break;
@@ -42,32 +58,34 @@ void showLoggerMenu() {
                     case 5: logLevel = spdlog::level::err; break;
                     case 6: logLevel = spdlog::level::critical; break;
                     case 7: logLevel = spdlog::level::off; break;
-                    default: std::cout << "Invalid option. Please try again.\n"; continue;
+                    default: 
+                        std::cout << Color::red << "Invalid option. Please try again." << Color::reset << std::endl; 
+                        continue;
                 }
-                std::cout << "Log level set.\n";
+                std::cout << Color::green << "Log level set." << Color::reset << std::endl;
                 break;
             }
             case 3: {
-                std::cout << "Enter log file path: ";
+                std::cout << Color::cyan << "Enter log file path: " << Color::reset;
                 std::cin >> logFilePath;
-                std::cout << "Log file path set to " << logFilePath << ".\n";
+                std::cout << Color::green << "Log file path set to " << logFilePath << "." << Color::reset << std::endl;
                 break;
             }
             case 4: {
                 loggerEnabled = !loggerEnabled;
                 if (logFilePath.empty()) {
                     logFilePath = (std::filesystem::current_path() / "default.log").string();
-                    std::cout << "No log file path specified. Using default: " << logFilePath << "\n";
+                    std::cout << Color::yellow << "No log file path specified. Using default: " << logFilePath << Color::reset << std::endl;
                 }
                 enableLogger(loggerEnabled, logFilePath, logLevel);
-                std::cout << "Logger " << (loggerEnabled ? "enabled" : "disabled") << ".\n";
+                std::cout << Color::green << "Logger " << (loggerEnabled ? "enabled" : "disabled") << "." << Color::reset << std::endl;
                 break;
             }
             case 5:
-                std::cout << "Returning to configuration menu...\n";
+                std::cout << Color::cyan << "Returning to configuration menu..." << Color::reset << std::endl;
                 break;
             default:
-                std::cout << "Invalid option. Please try again.\n";
+                std::cout << Color::red << "Invalid option. Please try again." << Color::reset << std::endl;
                 break;
         }
     } while (choice != 5);

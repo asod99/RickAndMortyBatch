@@ -6,20 +6,21 @@
 #include "DataBaseMenu.h"
 #include "APILoader.h"
 #include <spdlog/spdlog.h>
+#include "Colors.h"
 
 void showMenu() {
     int choice;
     DatabaseMenu dbMenu;
     do {
-        std::cout << "\n--- Rick and Morty Data Manager ---\n";
-        std::cout << "1. Load data from API\n";
-        std::cout << "2. Filter and search data from database\n";
-        std::cout << "3. Show Configuration Menu\n";
-        std::cout << "4. Exit\n";
-        std::cout << "Choose an option: ";
+        Color::printAnimatedText("\n--- Rick and Morty Data Manager ---", Color::cyan);
+        std::cout << Color::yellow << "1. " << Color::reset << Color::green << "Load data from API" << Color::reset << std::endl;
+        std::cout << Color::yellow << "2. " << Color::reset << Color::green << "Filter and search data from database" << Color::reset << std::endl;
+        std::cout << Color::yellow << "3. " << Color::reset << Color::green << "Show Configuration Menu" << Color::reset << std::endl;
+        std::cout << Color::yellow << "4. " << Color::reset << Color::green << "Exit" << Color::reset << std::endl;
+        std::cout << Color::magenta << "Choose an option: " << Color::reset;
         std::cin >> choice;
         if (std::cin.fail()) {
-            std::cout << "Invalid input. Please enter a number.\n";
+            std::cout << Color::red << "Invalid input. Please enter a number." << Color::reset << std::endl;
             std::cin.clear();  // Limpiamos el estado de error
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Limpiamos el buffer de entrada
             continue;
@@ -27,8 +28,9 @@ void showMenu() {
 
         switch (choice) {
             case 1:
-                std::cout << "Loading Data...Please wait this can take some time...\n";
+                Color::printAnimatedText("Loading Data...Please wait this can take some time...", Color::cyan);
                 ApiLoader::getInstance().loadDataManually();
+                Color::printAnimatedText("Data Succesfully Loaded", Color::yellow);
                 break;
             case 2:
                 dbMenu.dataBaseMenu();
@@ -37,10 +39,10 @@ void showMenu() {
                 showConfigurationMenu();
                 break;
             case 4:
-                std::cout << "Exiting...\n";
+                Color::printAnimatedText("Exiting...", Color::red);
                 break;
             default:
-                std::cout << "Invalid option. Please try again.\n";
+                std::cout << Color::red << "Invalid option. Please try again." << Color::reset << std::endl;
         }
     } while (choice != 4);
 }
@@ -50,18 +52,18 @@ void showConfigurationMenu() {
     std::string configFile;
     std::string baseUrl;
     do {
-        std::cout << "\n--- Configuration Menu ---\n";
-        std::cout << "1. Load configuration from file\n";
-        std::cout << "2. Configure API URL\n";
-        std::cout << "3. Configure Database Parameters\n";
-        std::cout << "4. Configure Time Batch Reconnection\n";
-        std::cout << "5. Logger\n";
-        std::cout << "6. Continue to main menu\n";
-        std::cout << "Choose an option: ";
+        Color::printAnimatedText("\n--- Configuration Menu ---", Color::cyan);
+        std::cout << Color::yellow << "1. " << Color::reset << Color::green << "Load configuration from file" << Color::reset << std::endl;
+        std::cout << Color::yellow << "2. " << Color::reset << Color::green << "Configure API URL" << Color::reset << std::endl;
+        std::cout << Color::yellow << "3. " << Color::reset << Color::green << "Configure Database Parameters" << Color::reset << std::endl;
+        std::cout << Color::yellow << "4. " << Color::reset << Color::green << "Configure Time Batch Reconnection" << Color::reset << std::endl;
+        std::cout << Color::yellow << "5. " << Color::reset << Color::green << "Logger" << Color::reset << std::endl;
+        std::cout << Color::yellow << "6. " << Color::reset << Color::green << "Continue to main menu" << Color::reset << std::endl;
+        std::cout << Color::magenta << "Choose an option: " << Color::reset;
         std::cin >> choice;
 
         if (std::cin.fail()) {
-            std::cout << "Invalid input. Please enter a number.\n";
+            std::cout << Color::red << "Invalid input. Please enter a number." << Color::reset << std::endl;
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
@@ -69,44 +71,44 @@ void showConfigurationMenu() {
 
         switch (choice) {
             case 1:
-                std::cout << "Enter the configuration file name: ";
+                std::cout << Color::cyan << "Enter the configuration file name: " << Color::reset;
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::getline(std::cin, configFile);
                 if (configFile.empty()) {
-                    std::cout << "Empty name.\n";
+                    std::cout << Color::red << "Empty name." << Color::reset << std::endl;
                     spdlog::warn("Empty configuration file name provided.");
                     break;
                 }
                 try {
                     Config::load(configFile);
-                    std::cout << "Configuration loaded from file.\n";
+                    std::cout << Color::green << "Configuration loaded from file." << Color::reset << std::endl;
                     ApiClient::getInstance().updateBaseUrl(Config::getApiBaseUrl());
                     DatabaseManager::getInstance().updateconnectionStringAndConnect(Config::getDatabaseConnectionString());
                     if (Config::getApiReconnectTime() != 0) {
                         ApiLoader::getInstance().updateInterval(Config::getApiReconnectTime());
                     }
                 } catch (const pqxx::broken_connection& e) {
-                    std::cerr << "Error: Cannot connect to the database. Check the configuration.\n";
-                    std::cerr << "Error detail: " << e.what() << std::endl;
+                    std::cerr << Color::red << "Error: Cannot connect to the database. Check the configuration." << Color::reset << std::endl;
+                    std::cerr << Color::red << "Error detail: " << e.what() << Color::reset << std::endl;
                     spdlog::error("Database connection error: {}", e.what());
                 } catch (const std::runtime_error& e) {
-                    std::cerr << "Error: " << e.what() << std::endl;
+                    std::cerr << Color::red << "Error: " << e.what() << Color::reset << std::endl;
                     spdlog::error("Runtime error: {}", e.what());
                 }
                 break;
             case 2: {
-                std::cout << "Current API URL: " << ApiClient::getInstance().getBaseUrl() << "\n";
-                std::cout << "Enter the new API URL (or leave empty to cancel): ";
+                std::cout << Color::cyan << "Current API URL: " << ApiClient::getInstance().getBaseUrl() << Color::reset << std::endl;
+                std::cout << Color::cyan << "Enter the new API URL (or leave empty to cancel): " << Color::reset;
                 
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::string newBaseUrl;
                 std::getline(std::cin, newBaseUrl);
                 
                 if (newBaseUrl.empty()) {
-                    std::cout << "Operation canceled. The URL has not changed.\n";
+                    std::cout << Color::yellow << "Operation canceled. The URL has not changed." << Color::reset << std::endl;
                 } else {
                     ApiClient::getInstance().updateBaseUrl(newBaseUrl);
-                    std::cout << "URL updated to: " << ApiClient::getInstance().getBaseUrl() << "\n";
+                    std::cout << Color::green << "URL updated to: " << ApiClient::getInstance().getBaseUrl() << Color::reset << std::endl;
                 }
                 break;
             }
@@ -114,23 +116,23 @@ void showConfigurationMenu() {
                 updateDatabaseConfig();
                 break;
             case 4: {
-                std::cout << "Current reconnection time: " << ApiLoader::getInstance().getInterval() << "\n";
-                std::cout << "Enter the new reconnection time (or leave empty to cancel): ";
+                std::cout << Color::cyan << "Current reconnection time: " << ApiLoader::getInstance().getInterval() << Color::reset << std::endl;
+                std::cout << Color::cyan << "Enter the new reconnection time (or leave empty to cancel): " << Color::reset;
                 
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::string newTime;
                 std::getline(std::cin, newTime);
                 
                 if (newTime.empty()) {
-                    std::cout << "Operation canceled. The time has not changed.\n";
+                    std::cout << Color::yellow << "Operation canceled. The time has not changed." << Color::reset << std::endl;
                 } else {
                     std::stringstream ss(newTime);
                     int newInterval;
                     if (ss >> newInterval && ss.eof() && newInterval > 0) {
                         ApiLoader::getInstance().updateInterval(newInterval);
-                        std::cout << "Time updated to: " << ApiLoader::getInstance().getInterval() << "\n";
+                        std::cout << Color::green << "Time updated to: " << ApiLoader::getInstance().getInterval() << Color::reset << std::endl;
                     } else {
-                        std::cout << "Error: Please enter a valid integer greater than zero.\n";
+                        std::cout << Color::red << "Error: Please enter a valid integer greater than zero." << Color::reset << std::endl;
                     }
                 }
                 break;
@@ -142,7 +144,7 @@ void showConfigurationMenu() {
                 showMenu();
                 break;
             default:
-                std::cout << "Invalid option. Please try again.\n";
+                std::cout << Color::red << "Invalid option. Please try again." << Color::reset << std::endl;
         }
     } while (choice != 6);
 }
@@ -151,14 +153,14 @@ void updateDatabaseConfig() {
     DatabaseManager& dbManager = DatabaseManager::getInstance();
 
     while (true) {
-        std::cout << "\n--- Current Database Configuration ---\n";
-        std::cout << "1. Host: " << dbManager.getHost() << "\n";
-        std::cout << "2. User: " << dbManager.getUser() << "\n";
-        std::cout << "3. Port: " << dbManager.getPort() << "\n";
-        std::cout << "4. Password: [HIDDEN]\n";
-        std::cout << "5. Exit without saving\n";
-        std::cout << "6. Save changes and exit\n";
-        std::cout << "Select a parameter to modify (1-6): ";
+        Color::printAnimatedText("\n--- Current Database Configuration ---", Color::cyan);
+        std::cout << Color::yellow << "1. " << Color::reset << "Host: " << dbManager.getHost() << std::endl;
+        std::cout << Color::yellow << "2. " << Color::reset << "User: " << dbManager.getUser() << std::endl;
+        std::cout << Color::yellow << "3. " << Color::reset << "Port: " << dbManager.getPort() << std::endl;
+        std::cout << Color::yellow << "4. " << Color::reset << "Password: [HIDDEN]" << std::endl;
+        std::cout << Color::yellow << "5. " << Color::reset << "Exit without saving" << std::endl;
+        std::cout << Color::yellow << "6. " << Color::reset << "Save changes and exit" << std::endl;
+        std::cout << Color::magenta << "Select a parameter to modify (1-6): " << Color::reset;
 
         int option;
         std::cin >> option;
@@ -166,7 +168,7 @@ void updateDatabaseConfig() {
 
         std::string newValue;
         if (option >= 1 && option <= 4) {
-            std::cout << "Enter the new value: ";
+            std::cout << Color::cyan << "Enter the new value: " << Color::reset;
             std::getline(std::cin, newValue);
         }
 
@@ -184,20 +186,20 @@ void updateDatabaseConfig() {
                 dbManager.setPassword(newValue);
                 break;
             case 5:
-                std::cout << "Saliendo sin guardar cambios...\n";
+                std::cout << Color::yellow << "Saliendo sin guardar cambios..." << Color::reset << std::endl;
                 return;
             case 6:
                 try {
                     dbManager.getInstance().connectToDatabase();
-                    std::cout << "Connection updated successfully.\n";
+                    std::cout << Color::green << "Connection updated successfully." << Color::reset << std::endl;
                     return;
                 } catch (const pqxx::broken_connection& e) {
-                    std::cerr << "Error: Cannot connect to the database. Check the configuration.\n";
-                    std::cerr << "Error detail: " << e.what() << std::endl;
+                    std::cerr << Color::red << "Error: Cannot connect to the database. Check the configuration." << Color::reset << std::endl;
+                    std::cerr << Color::red << "Error detail: " << e.what() << Color::reset << std::endl;
                     return;
                 }
             default:
-                std::cout << "Invalid option. Please try again.\n";
+                std::cout << Color::red << "Invalid option. Please try again." << Color::reset << std::endl;
         }
     }
 }

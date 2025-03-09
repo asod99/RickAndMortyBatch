@@ -22,6 +22,7 @@ cmake_minimum_required(VERSION 3.10)
         src/API/APILoader.cpp
         src/Config/Config.cpp
         src/Menu/Menu.cpp
+        src/Menu/Colors.cpp
     )
 
     # Include directories

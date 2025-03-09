@@ -5,17 +5,18 @@
 #include "DataBaseManager.h"
 #include <mutex>
 #include <spdlog/spdlog.h>
+#include "Colors.h"
 
 void DatabaseMenu::showHelp() {
-    std::cout << "Available commands (order does not matter):" << std::endl;
-    std::cout << "  characters --filter <field>={value} --only <field> --size --size-only" << std::endl;
-    std::cout << "  episodes --filter <field>={value} --only <field> --size --size-only" << std::endl;
-    std::cout << "  locations --filter <field>={value} --only <field> --size --size-only" << std::endl;
-    std::cout << "Options:" << std::endl;
-    std::cout << "  --filter <field>={value} : Filter by field, use '{value}' for starts with" << std::endl;
-    std::cout << "  --only <field> : Display only specified field" << std::endl;
-    std::cout << "  --size : Show the number of results" << std::endl;
-    std::cout << "  --size-only : Show only the number of results" << std::endl;
+    Color::printAnimatedText("Available commands (order does not matter):", Color::cyan);
+    std::cout << Color::yellow << "  characters --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
+    std::cout << Color::yellow << "  episodes --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
+    std::cout << Color::yellow << "  locations --filter <field>={value} --only <field> --size --size-only" << Color::reset << std::endl;
+    std::cout << Color::green << "Options:" << Color::reset << std::endl;
+    std::cout << Color::cyan << "  --filter <field>={value} : Filter by field, use '{value}' for starts with" << Color::reset << std::endl;
+    std::cout << Color::cyan << "  --only <field> : Display only specified field" << Color::reset << std::endl;
+    std::cout << Color::cyan << "  --size : Show the number of results" << Color::reset << std::endl;
+    std::cout << Color::cyan << "  --size-only : Show only the number of results" << Color::reset << std::endl;
 }
 
 std::string join(const std::vector<std::string>& elements, const std::string& delimiter) {
@@ -41,14 +42,14 @@ void DatabaseMenu::executeQuery(const std::string& query, std::vector<std::strin
     pqxx::result res = txn.exec(query);
 
     if (showSize || sizeOnly) {
-        std::cout << "Total results: " << res.size() << std::endl;
+        std::cout << Color::magenta << "Total results: " << res.size() << Color::reset << std::endl;
         if (sizeOnly) return;
     }
 
     for (const auto& row : res) {
         for (const auto& field : row) {
             if (onlyFields.empty() || find(onlyFields.begin(), onlyFields.end(), field.name()) != onlyFields.end()) {
-                std::cout << field.name() << ": " << field.c_str() << " | ";
+                std::cout << Color::cyan << field.name() << Color::reset << ": " << Color::green << field.c_str() << Color::reset << " | ";
             }
         }
         std::cout << std::endl;
@@ -70,7 +71,7 @@ void DatabaseMenu::processCommand(const std::string& command) {
 
     if (args[0] == "all") {
         for (const auto& table : validTables) {
-            std::cout << "Results from table: " << table << std::endl;
+            Color::printAnimatedText("Results from table: " + table, Color::yellow);
             spdlog::info("Executing query for table: {}", table);
             executeQueryForTable(table, args);
         }
@@ -79,7 +80,7 @@ void DatabaseMenu::processCommand(const std::string& command) {
 
     std::string table = args[0];
     if (find(validTables.begin(), validTables.end(), table) == validTables.end()) {
-        std::cout << "Invalid table. Available options: characters, episodes, locations" << std::endl;
+        std::cout << Color::red << "Invalid table. Available options: characters, episodes, locations" << Color::reset << std::endl;
         return;
     }
 
@@ -102,7 +103,7 @@ void DatabaseMenu::executeQueryForTable(const std::string& table, const std::vec
                     if (validateField(table, field)) {
                         filters.push_back(filter);
                     } else {
-                        std::cout << "Invalid field: " << field << " for table " << table << std::endl;
+                        std::cout << Color::red << "Invalid field: " << field << " for table " << table << Color::reset << std::endl;
                     }
                 }
             }
@@ -153,9 +154,9 @@ bool DatabaseMenu::validateField(const std::string& tableName, const std::string
 
 void DatabaseMenu::dataBaseMenu() {
     std::string command;
-    std::cout << "--MENU SEARCH DATABASE--" << std::endl;
+    Color::printAnimatedText("--MENU SEARCH DATABASE--", Color::magenta);
     while (true) {
-        std::cout << "Enter command: ";
+        std::cout << Color::cyan << "Enter command: " << Color::reset;
         getline(std::cin, command);
 
         if (command == "exit") {
