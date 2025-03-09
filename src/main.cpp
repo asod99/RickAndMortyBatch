@@ -1,49 +1,31 @@
 #include "Config.h"
-#include "Logger.h"
+#include <spdlog/spdlog.h>
 #include "ApiClient.h"
-#include "DatabaseManager.h"
-#include "CharacterProcessor.h"
-#include "LocationProcessor.h"
-#include "EpisodeProcessor.h"
-#include "BatchProcessor.h"
+#include "Logger.h"
 #include "Menu.h"
 #include <iostream>
+#include "Colors.h"
 
 int main() {
-    try {
-        // Load configuration
-        Config::load("config/config.json");
+    try{
 
-        // Initialize logger
-        Logger::init(Config::getLogFilePath());
+        Logger::setupNullLogger();
 
-        // Log application start
-        spdlog::info("Application started.");
+        Color::initialize();
 
-        // Initialize database manager
-        DatabaseManager dbManager(Config::getDatabaseConnectionString());
+     
+        std::cout << Color::cyan << "=====================================" << Color::reset << std::endl;
+        std::cout << Color::magenta << "********** " << Color::reset << std::endl;
+        Color::printAnimatedText("WELCOME TO RICK AND MORTY BATCH APP", Color::green);
+        std::cout << Color::magenta << "**********" << Color::reset << std::endl;
+        std::cout << Color::cyan << "=====================================" << Color::reset << std::endl;
 
-        // Initialize API client
-        ApiClient apiClient(Config::getApiBaseUrl());
-
-        // Initialize processors
-        CharacterProcessor charProcessor(dbManager);
-        LocationProcessor locProcessor(dbManager);
-        EpisodeProcessor epiProcessor(dbManager);
-
-        // Initialize batch processor
-        BatchProcessor batchProcessor(apiClient);
-
-        // Show menu
-        showMenu(batchProcessor, dbManager);
-
-        // Log application end
-        spdlog::info("Application finished.");
+        //Show Welcome Menu
+        showConfigurationMenu();
 
     } catch (const std::exception& e) {
         spdlog::error("An error occurred: {}", e.what());
         return EXIT_FAILURE;
     }
-
-    return EXIT_SUCCESS;
+    std::quick_exit(EXIT_SUCCESS);
 }

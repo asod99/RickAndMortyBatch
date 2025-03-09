@@ -23,19 +23,19 @@ public:
     static std::string getDatabaseConnectionString();
 
     /**
-     * @brief Retrieves the log file path.
-     * @return Log file path.
-     */
-    static std::string getLogFilePath();
-
-    /**
      * @brief Retrieves the base URL for the API.
      * @return Base URL for the API.
      */
     static std::string getApiBaseUrl();
 
+    /**
+     * @brief Retrieves the API reconnect time.
+     * @return API reconnect time in milliseconds.
+     */
+    static uint64_t getApiReconnectTime();
+
 private:
-    static Json::Value configData; ///< JSON object to store configuration data.
+    static Json::Value _configData; ///< JSON object to store configuration data.
 };
 
 #endif // CONFIG_H

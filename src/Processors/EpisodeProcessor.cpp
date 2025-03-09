@@ -2,7 +2,7 @@
 #include <spdlog/spdlog.h>
 
 EpisodeProcessor::EpisodeProcessor(DatabaseManager& dbManager)
-    : dbManager(dbManager) {
+    : _dbManager(dbManager) {
     spdlog::info("EpisodeProcessor initialized.");
 }
 
@@ -17,6 +17,6 @@ void EpisodeProcessor::process(const Json::Value& data) {
         std::string url = episode["url"].asString();
         std::string created = episode["created"].asString();
 
-        dbManager.insertEpisode(id, name, airDate, episodeCode, url, created);
+        _dbManager.insertEpisode(id, name, airDate, episodeCode, url, created);
     }
 }

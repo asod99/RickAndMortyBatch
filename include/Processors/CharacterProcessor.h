@@ -6,7 +6,7 @@
 
 /**
  * @class CharacterProcessor
- * @brief Class to process character data from the API.
+ * @brief Class to process character data from the API and store it in the database.
  */
 class CharacterProcessor {
 public:
@@ -21,9 +21,15 @@ public:
      * @param data The JSON data containing character information.
      */
     void process(const Json::Value& data);
-
 private:
-    DatabaseManager& dbManager; ///< Reference to the DatabaseManager.
+    /**
+     * @brief Extracts the episode ID from a given episode URL.
+     * @param episodeUrl The URL of the episode.
+     * @return The extracted episode ID.
+     */
+    int extractEpisodeIdFromUrl(const std::string& episodeUrl);
+
+    DatabaseManager& _dbManager; ///< Reference to the DatabaseManager for handling database operations.
 };
 
 #endif // CHARACTERPROCESSOR_H

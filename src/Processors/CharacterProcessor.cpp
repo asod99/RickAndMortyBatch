@@ -2,7 +2,7 @@
 #include <spdlog/spdlog.h>
 
 CharacterProcessor::CharacterProcessor(DatabaseManager& dbManager)
-    : dbManager(dbManager) {
+    : _dbManager(dbManager) {
     spdlog::info("CharacterProcessor initialized.");
 }
 
@@ -24,6 +24,21 @@ void CharacterProcessor::process(const Json::Value& data) {
         std::string url = character["url"].asString();
         std::string created = character["created"].asString();
 
-        dbManager.insertCharacter(id, name, status, species, type, gender, originName, originUrl, locationName, locationUrl, image, url, created);
+        _dbManager.insertCharacter(id, name, status, species, type, gender, originName, originUrl, locationName, locationUrl, image, url, created);
+
+        // Process episodes for this character
+        const Json::Value& episodes = character["episode"];
+        for (const auto& episodeUrl : episodes) {
+            int episodeId = extractEpisodeIdFromUrl(episodeUrl.asString());
+            _dbManager.insertCharacterEpisode(id, episodeId);
+        }
     }
+}
+
+int CharacterProcessor::extractEpisodeIdFromUrl(const std::string& episodeUrl) {
+    size_t lastSlashPos = episodeUrl.find_last_of('/');
+    if (lastSlashPos != std::string::npos) {
+        return std::stoi(episodeUrl.substr(lastSlashPos + 1));
+    }
+    return -1;
 }

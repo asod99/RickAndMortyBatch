@@ -14,10 +14,25 @@
 class ApiClient {
 public:
     /**
-     * @brief Constructs an ApiClient.
-     * @param baseUrl The base URL of the API.
+     * @brief Deleted copy constructor to prevent copying.
      */
-    explicit ApiClient(std::string_view baseUrl);
+    ApiClient(const ApiClient&) = delete;
+
+    /**
+     * @brief Deleted assignment operator to prevent copying.
+     */
+    ApiClient& operator=(const ApiClient&) = delete;
+
+    /**
+     * @brief Static method to get the singleton instance of ApiClient.
+     * @return The unique instance of ApiClient.
+     */
+    static ApiClient& getInstance();
+
+    /**
+     * @brief Constructs an ApiClient.
+     */
+    explicit ApiClient();
 
     /**
      * @brief Retrieves data from a specific API resource with optional filters.
@@ -29,8 +44,21 @@ public:
      */
     Json::Value getResource(std::string_view resource, int page = 1, const std::unordered_map<std::string, std::string>& filters = {});
 
+    /**
+     * @brief Updates the base URL for the API.
+     * @param newBaseUrl The new base URL to set.
+     */
+    void updateBaseUrl(const std::string& newBaseUrl);
+
+    /**
+     * @brief Gets the current base URL of the API.
+     * @return The base URL as a string.
+     */
+    std::string getBaseUrl() const;
+
 private:
-    std::string baseUrl; ///< Base URL of the API.
+    static std::unique_ptr<ApiClient> _instance; ///< Singleton instance of ApiClient.
+    std::string _baseUrl; ///< Base URL of the API.
 
     /**
      * @brief Constructs a URL with query parameters.
