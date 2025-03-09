@@ -1,6 +1,7 @@
 #include "DatabaseManager.h"
 #include <spdlog/spdlog.h>
 #include "iostream"
+#include <APILoader.h>
 
 std::unique_ptr<DatabaseManager> DatabaseManager::instance = nullptr;
 
@@ -73,6 +74,7 @@ void DatabaseManager::insertLocation(int id, const std::string& name, const std:
 void DatabaseManager::insertEpisode(int id, const std::string& name, const std::string& airDate,
     const std::string& episode, const std::string& url, const std::string& created) {
     try {
+        std::lock_guard<std::mutex> lock(dbMutex);
         pqxx::work txn(*conn);
         std::string query = R"(
             INSERT INTO episodes (id, name, air_date, episode, url, created)
@@ -96,6 +98,7 @@ void DatabaseManager::insertEpisode(int id, const std::string& name, const std::
 
 void DatabaseManager::insertCharacterEpisode(int characterId, int episodeId) {
     try {
+        std::lock_guard<std::mutex> lock(dbMutex);
         pqxx::work txn(*conn);
 
         pqxx::zview query = R"(
@@ -115,6 +118,7 @@ void DatabaseManager::insertCharacterEpisode(int characterId, int episodeId) {
 
 void DatabaseManager::insertCharacterLocation(int characterId, int locationId) {
     try {
+        std::lock_guard<std::mutex> lock(dbMutex);
         pqxx::work txn(*conn);
 
         // SQL para insertar la relación entre personaje y ubicación
@@ -181,34 +185,11 @@ void DatabaseManager::connectToDatabase()
     createDataBaseIfNotExist();
     conn->close();
     conn = std::make_unique<pqxx::connection>(connectionString);
-
-    /*try {
-        pqxx::work txn(*conn);
-        
-        // Consulta para obtener los nombres de todas las tablas en el esquema 'public'
-        std::string query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
-        pqxx::result res = txn.exec(query);
-
-        if (res.empty()) {
-            spdlog::info("No tables found in the 'public' schema.");
-        } else {
-            // Recorre las tablas y ejecuta un DROP TABLE para cada una
-            for (const auto& row : res) {
-                std::string table_name = row["table_name"].as<std::string>();
-                std::string drop_query = "DROP TABLE IF EXISTS public." + table_name + " CASCADE;";
-                txn.exec(drop_query);
-                spdlog::info("Table '{}' has been dropped.", table_name);
-            }
-        }
-
-        txn.commit();
-    } catch (const std::exception& e) {
-        spdlog::error("Error dropping tables: {}", e.what());
-    }*/
-   
+ 
    createTablesIfNotExist();
 
    try {
+    std::lock_guard<std::mutex> lock(dbMutex);
     pqxx::work txn(*conn);
     
     std::string query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
@@ -249,6 +230,7 @@ void DatabaseManager::connectToDatabase()
         spdlog::error("Error retrieving data from 'characters' table: {}", e.what());
     }
 
+    ApiLoader::getInstance().start();
 
 }
 
@@ -278,6 +260,7 @@ bool DatabaseManager::isConnected() {
 void DatabaseManager::createDataBaseIfNotExist()
 {
     try {
+        std::lock_guard<std::mutex> lock(dbMutex);
         // Crear la base de datos si no existe
         std::string createDatabaseQuery = "CREATE DATABASE " + database + ";";
         pqxx::nontransaction txn(*conn);
@@ -302,6 +285,7 @@ void DatabaseManager::createDataBaseIfNotExist()
 
 void DatabaseManager::createTablesIfNotExist() {
     try {
+        std::lock_guard<std::mutex> lock(dbMutex);
         pqxx::work txn(*conn);
 
         // SQL para crear la tabla de personajes

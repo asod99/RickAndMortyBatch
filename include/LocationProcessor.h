@@ -22,6 +22,11 @@ public:
      */
     void process(const Json::Value& data);
 
+    /**
+     * @brief Extracts the character ID from a given character URL.
+     * @param episodeUrl The URL of the character.
+     * @return The extracted character ID.
+     */
     int extractCharacterIdFromUrl(const std::string& characterUrl);
 
 private:

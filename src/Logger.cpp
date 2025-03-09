@@ -1,6 +1,7 @@
 #include "Logger.h"
 #include <iostream>
 #include <memory>
+#include <fstream>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/null_sink.h>
@@ -29,6 +30,30 @@ void Logger::init(const std::string& logFilePath, spdlog::level::level_enum logL
         spdlog::info("Logger initialized.");
     } catch (const spdlog::spdlog_ex& ex) {
         std::cerr << "Log initialization failed: " << ex.what() << std::endl;
+    }
+}
+
+void Logger::checkLogSizeAndReset() {
+    std::ifstream file(currentLogFilePath);
+    if (!file.is_open()) {
+        return;
+    }
+
+    std::string line;
+    size_t line_count = 0;
+    while (std::getline(file, line)) {
+        ++line_count;
+    }
+
+    file.close();
+
+    if (line_count > 5000) {
+        // Reiniciar el archivo de log
+        std::ofstream outFile(currentLogFilePath, std::ofstream::trunc);
+        if (outFile.is_open()) {
+            outFile.close();
+            spdlog::info("Log file reset after exceeding 5000 lines.");
+        }
     }
 }
 

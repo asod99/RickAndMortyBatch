@@ -79,6 +79,7 @@
         "deque": "cpp",
         "iostream": "cpp",
         "stack": "cpp",
-        "pqxx": "cpp"
+        "pqxx": "cpp",
+        "unordered_set": "cpp"
     }
 }

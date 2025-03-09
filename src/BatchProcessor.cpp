@@ -1,6 +1,7 @@
 #include "BatchProcessor.h"
 #include <spdlog/spdlog.h>
 #include <stdexcept>
+#include "Logger.h"
 
 BatchProcessor::BatchProcessor(ApiClient& apiClient, DatabaseManager& dbManager) : _apiClient(apiClient), _dbmanager(dbManager)
 {
@@ -54,5 +55,6 @@ void BatchProcessor::processResource(const std::string& resource) {
             spdlog::error("Failed to process resource {}: {}", resource, e.what());
             hasMorePages = false;
         }
+        Logger::checkLogSizeAndReset();
     }
 }

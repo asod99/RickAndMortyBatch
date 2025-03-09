@@ -18,8 +18,9 @@ public:
     /**
      * @brief Constructs a BatchProcessor.
      * @param apiClient The ApiClient used to fetch data.
+     * @param dbManager The DatabaseManager used to store processed data.
      */
-    explicit BatchProcessor(ApiClient& apiClient , DatabaseManager& dbManager);
+    explicit BatchProcessor(ApiClient& apiClient, DatabaseManager& dbManager);
 
     /**
      * @brief Executes the batch processing for all resources.
@@ -28,6 +29,8 @@ public:
 
 private:
     ApiClient& _apiClient; ///< Reference to the ApiClient.
+    DatabaseManager& _dbmanager; ///< Reference to the DatabaseManager.
+    
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> resourceFilters; ///< Filters for each resource.
 
     /**
@@ -36,12 +39,9 @@ private:
      */
     void processResource(const std::string& resource);
 
-    std::unique_ptr<CharacterProcessor> _characterProcessor;
-    std::unique_ptr<LocationProcessor> _locationProcessor;
-    std::unique_ptr< EpisodeProcessor> _episodeProcessor;
-    DatabaseManager& _dbmanager;
-    
-
+    std::unique_ptr<CharacterProcessor> _characterProcessor; ///< Processor for character data.
+    std::unique_ptr<LocationProcessor> _locationProcessor; ///< Processor for location data.
+    std::unique_ptr<EpisodeProcessor> _episodeProcessor; ///< Processor for episode data.
 };
 
 #endif // BATCHPROCESSOR_H

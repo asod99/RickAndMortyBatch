@@ -19,6 +19,7 @@ cmake_minimum_required(VERSION 3.10)
         src/LoggerMenu.cpp
         src/DataBaseMenu.cpp
         src/Logger.cpp
+        src/APILoader.cpp
         src/Config.cpp
         src/Menu.cpp
     )

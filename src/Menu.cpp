@@ -4,29 +4,11 @@
 #include <string>
 #include "LoggerMenu.h"
 #include "DataBaseMenu.h"
-
-void loadDataFromApi() {
-    std::cout << "Loading data from API...\n";
-    DatabaseManager& dbManager = DatabaseManager::getInstance();
-    if(!dbManager.isConnected())
-    {
-        std::cout << "La base de datos no está conectada\n"; 
-        showMenu();
-    }
-    try {
-        BatchProcessor batchProcessor(ApiClient::getInstance(), DatabaseManager::getInstance());
-        batchProcessor.execute();
-
-        std::cout << "Data loaded successfully.\n";
-    } catch (const std::exception& e) {
-        std::cerr << "Error inesperado al cargar los datos: " << e.what() << std::endl;
-    }
-}
+#include "APILoader.h"
 
 void showMenu() {
     int choice;
-    DatabaseManager& dbManager = DatabaseManager::getInstance();
-    DatabaseMenu dbMenu(dbManager.getConn());
+    DatabaseMenu dbMenu;
     do {
         std::cout << "\n--- Rick and Morty Data Manager ---\n";
         std::cout << "1. Load data from API\n";
@@ -35,9 +17,17 @@ void showMenu() {
         std::cout << "4. Exit\n";
         std::cout << "Choose an option: ";
         std::cin >> choice;
+        if (std::cin.fail()) {
+            std::cout << "Invalid input. Please enter a number.\n";
+            std::cin.clear();  // Limpiamos el estado de error
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Limpiamos el buffer de entrada
+            continue;
+        }
+
         switch (choice) {
             case 1:
-                loadDataFromApi();
+                std::cout << "Loading Data...Please wait this can take some time...\n";
+                ApiLoader::getInstance().loadDataManually();
                 break;
             case 2:
                 dbMenu.dataBaseMenu();
@@ -47,11 +37,12 @@ void showMenu() {
                 break;
             case 4:
                 std::cout << "Exiting...\n";
+                std::quick_exit(0);
                 break;
             default:
                 std::cout << "Invalid option. Please try again.\n";
         }
-    } while (choice != 3);
+    } while (choice != 4);
 }
 
 void showConfigurationMenu() {
@@ -63,24 +54,46 @@ void showConfigurationMenu() {
         std::cout << "1. Load configuration from file\n";
         std::cout << "2. Configure API url\n";
         std::cout << "3. Configure Data Base Parameters\n";
-        std::cout << "4. Logger\n";
-        std::cout << "5. Continue to main menu\n";
+        std::cout << "4. Configure Time Batch Reconnection\n";
+        std::cout << "5. Logger\n";
+        std::cout << "6. Continue to main menu\n";
         std::cout << "Choose an option: ";
         std::cin >> choice;
+
+        if (std::cin.fail()) {
+            std::cout << "Invalid input. Please enter a number.\n";
+            std::cin.clear();  // Limpiamos el estado de error
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Limpiamos el buffer de entrada
+            continue;
+        }
+
         switch (choice) {
             case 1:
                 std::cout << "Introduce el nombre del archivo de configuración: ";
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // 🔹 Limpia el buffer
                 std::getline(std::cin, configFile);
+                if(configFile.empty())
+                {
+                    std::cout << "Nombre vacío.\n";
+                    break; 
+                }
                 try{
                     Config::load(configFile);
                     std::cout << "Configuration loaded from file.\n";
                     ApiClient::getInstance().updateBaseUrl(Config::getApiBaseUrl());
                     DatabaseManager::getInstance().updateconnectionStringAndConnect(Config::getDatabaseConnectionString());
+                    if(Config::getApiReconnectTime() != 0 )
+                    ApiLoader::getInstance().updateInterval(Config::getApiReconnectTime());
+                    else
+                    std::cout << "HEYU 2" << Config::getApiReconnectTime();
                    
                 }catch (const pqxx::broken_connection& e) {
                     std::cerr << "Error: No se puede conectar a la base de datos. Verifique la configuración.\n";
                     std::cerr << "Detalle del error: " << e.what() << std::endl;
+                    showConfigurationMenu();
+                }catch(const std::runtime_error& e)
+                {
+                    std::cerr << "Error: " << e.what() << std::endl; 
                     showConfigurationMenu();
                 }
                 
@@ -106,15 +119,38 @@ void showConfigurationMenu() {
                 updateDatabaseConfig();
                 break;
             case 4:
+            {
+                std::cout << "Tiempo de reconexión actual: " << ApiLoader::getInstance().getInterval() << "\n";
+                std::cout << "Introduce el nuevo tiempo de reconexión (o deja vacío para cancelar): ";
+                
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // 🔹 Limpia el buffer
+                std::string newTime;
+                std::getline(std::cin, newTime);
+                
+                if (newTime.empty()) {
+                    std::cout << "Operación cancelada. El tiempo no ha cambiado.\n";
+                } else {
+                    std::stringstream ss(newTime);
+                    int newInterval;
+                    if (ss >> newInterval && ss.eof() && newInterval > 0) {
+                        ApiLoader::getInstance().updateInterval(newInterval);
+                        std::cout << "Tiempo actualizado a: " << ApiLoader::getInstance().getInterval() << "\n";
+                    } else {
+                        std::cout << "Error: Por favor, introduce un número entero válido mayor que cero.\n";
+                    }
+                }
+                break;
+            }
+            case 5:
                 showLoggerMenu();
                 break;
-            case 5:
+            case 6:
                 showMenu();
                 break;
             default:
                 std::cout << "Invalid option. Please try again.\n";
         }
-    } while (choice != 5);
+    } while (choice != 6);
 }
 
 void updateDatabaseConfig() {

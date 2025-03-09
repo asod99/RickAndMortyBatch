@@ -28,6 +28,12 @@ public:
      */
     static std::string getApiBaseUrl();
 
+    /**
+     * @brief Retrieves the API reconnect time.
+     * @return API reconnect time in milliseconds.
+     */
+    static uint64_t getApiReconnectTime();
+
 private:
     static Json::Value configData; ///< JSON object to store configuration data.
 };

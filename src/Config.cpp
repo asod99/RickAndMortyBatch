@@ -22,3 +22,7 @@ std::string Config::getDatabaseConnectionString() {
 std::string Config::getApiBaseUrl() {
     return configData["api"]["base_url"].asString();
 }
+
+uint64_t Config::getApiReconnectTime() {
+    return configData["api"]["update_time"].asUInt64();
+}
