@@ -110,6 +110,12 @@ public:
     void setHost(const std::string& h) { _host = h; }
 
     /**
+     * @brief Sets the DataBaseName for the database connection.
+     * @param b BaseName.
+     */
+    void setBaseName(const std::string& b) { _database = b; }
+
+    /**
      * @brief Sets the user for the database connection.
      * @param u Username.
      */
@@ -144,6 +150,12 @@ public:
      * @return Port number.
      */
     std::string getPort() const { return _port; }
+
+    /**
+     * @brief Gets the BaseName for the database connection.
+     * @return Data Base Name.
+     */
+    std::string getBaseName() const { return _database; }
 
     /**
      * @brief Connects to the database using the current connection settings.

@@ -147,7 +147,10 @@ DatabaseManager& DatabaseManager::getInstance() {
 
 void DatabaseManager::updateconnectionStringAndConnect(const std::string& newconnectionString) {
     std::map<std::string, std::string> connectionParams = parseConnectionString(newconnectionString);
-    
+
+    if (connectionParams.find("dbname") != connectionParams.end()) {
+        setBaseName(connectionParams["dbname"]);
+    }
     if (connectionParams.find("host") != connectionParams.end()) {
         setHost(connectionParams["host"]);
     }

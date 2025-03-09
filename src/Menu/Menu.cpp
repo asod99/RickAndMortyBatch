@@ -157,9 +157,10 @@ void updateDatabaseConfig() {
         std::cout << Color::yellow << "1. " << Color::reset << "Host: " << dbManager.getHost() << std::endl;
         std::cout << Color::yellow << "2. " << Color::reset << "User: " << dbManager.getUser() << std::endl;
         std::cout << Color::yellow << "3. " << Color::reset << "Port: " << dbManager.getPort() << std::endl;
-        std::cout << Color::yellow << "4. " << Color::reset << "Password: [HIDDEN]" << std::endl;
-        std::cout << Color::yellow << "5. " << Color::reset << "Exit without saving" << std::endl;
-        std::cout << Color::yellow << "6. " << Color::reset << "Save changes and exit" << std::endl;
+        std::cout << Color::yellow << "4. " << Color::reset << "DataBase: " << dbManager.getBaseName() << std::endl;
+        std::cout << Color::yellow << "5. " << Color::reset << "Password: [HIDDEN]" << std::endl;
+        std::cout << Color::yellow << "6. " << Color::reset << "Exit without saving" << std::endl;
+        std::cout << Color::yellow << "7. " << Color::reset << "Save changes and exit" << std::endl;
         std::cout << Color::magenta << "Select a parameter to modify (1-6): " << Color::reset;
 
         int option;
@@ -183,12 +184,15 @@ void updateDatabaseConfig() {
                 dbManager.setPort(newValue);
                 break;
             case 4:
-                dbManager.setPassword(newValue);
+                dbManager.setBaseName(newValue);
                 break;
             case 5:
+                dbManager.setPassword(newValue);
+                break;
+            case 6:
                 std::cout << Color::yellow << "Saliendo sin guardar cambios..." << Color::reset << std::endl;
                 return;
-            case 6:
+            case 7:
                 try {
                     dbManager.getInstance().connectToDatabase();
                     std::cout << Color::green << "Connection updated successfully." << Color::reset << std::endl;
